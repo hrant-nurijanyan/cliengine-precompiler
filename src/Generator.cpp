@@ -24,15 +24,19 @@ void bebop::cliengine::preprocessor::Generator::generate(const std::string& json
 
     out << "#ifndef CLIENGINE_PRECOMPILED_COMMANDS_HPP\n";
     out << "#define CLIENGINE_PRECOMPILED_COMMANDS_HPP\n\n";
-    out << "#include <cliengine/Defines.hpp>\n\n";
+    out << "#include <cliengine/Defines.hpp>\n";
+    out << "#include <unordered_map>\n";
+    out << "#include <string>\n\n";
+
     out << "namespace bebop::cliengine::precompiled {\n\n";
-    out << "inline std::unordered_map<std::string, bebop::cliengine::CommandDef> loadPrecompiledCommands() {\n";
-    out << "    using namespace bebop::cliengine;\n";
-    out << "    std::unordered_map<std::string, CommandDef> map;\n\n";
+    out << "using bebop::cliengine::ArgumentType;\n";
+    out << "using bebop::cliengine::CommandDef;\n\n";
+
+    out << "static const std::unordered_map<std::string, CommandDef> kPrecompiledCommands = {\n";
 
     for (const auto& cmd : j["commands"])
     {
-        out << "    map[\"" << escape(cmd["name"]) << "\"] = CommandDef{\n";
+        out << "    { \"" << escape(cmd["name"]) << "\", CommandDef{\n";
         out << "        \"" << escape(cmd["name"]) << "\",\n";
         out << "        \"" << escape(cmd["description"]) << "\",\n";
 
@@ -53,11 +57,11 @@ void bebop::cliengine::preprocessor::Generator::generate(const std::string& json
                 << (flag["required"].get<bool>() ? "true" : "false") << " },\n";
         }
         out << "        }\n";
-        out << "    };\n\n";
+
+        out << "    } },\n\n";
     }
 
-    out << "    return map;\n";
-    out << "}\n\n";  // close function
+    out << "};\n\n";  // end of kPrecompiledCommands
     out << "} // namespace bebop::cliengine::precompiled\n\n";
     out << "#endif  // CLIENGINE_PRECOMPILED_COMMANDS_HPP\n";
 }
